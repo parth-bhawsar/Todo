@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ededed;
+    --foreground: #ededed;
+  }
+}
+
+
+
+
+
+/* Rainbow Text Effects */
+.rainbow-text {
+  background: linear-gradient(90deg, 
+    #ff0000, #ff7f00, #ffff00, #00ff00, 
+    #0000ff, #4b0082, #9400d3);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbow 8s linear infinite;
+}
+
+.rainbow-text-subtle {
+  background: linear-gradient(90deg, 
+    #ff7f7f, #ffbf7f, #ffff7f, #7fff7f, 
+    #7f7fff, #bf7fff, #ff7fff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbow 6s linear infinite;
+}
+
+.rainbow-text-shadow {
+  text-shadow: 0 0 8px rgba(255,0,0,0.3), 
+              0 0 16px rgba(255,127,0,0.3),
+              0 0 24px rgba(255,255,0,0.3);
+}
+
+/* Rainbow Border Effects */
+.rainbow-border {
+  border: 2px solid transparent;
+  border-image: linear-gradient(90deg, 
+    #ff0000, #ff7f00, #ffff00, #00ff00, 
+    #0000ff, #4b0082, #9400d3) 1;
+  animation: rainbow-border 8s linear infinite;
+}
+
+.rainbow-bg {
+  background: linear-gradient(90deg, 
+    #ff0000, #ff7f00, #ffff00, #00ff00, 
+    #0000ff, #4b0082, #9400d3);
+  background-size: 400% 100%;
+  animation: rainbow 8s linear infinite;
+}
+
+/* Animations */
+@keyframes rainbow {
+  0% { background-position: 0% 50% }
+  100% { background-position: 100% 50% }
+}
+
+@keyframes rainbow-border {
+  0% { border-image-source: linear-gradient(90deg, 
+    #ff0000, #ff7f00, #ffff00, #00ff00, 
+    #0000ff, #4b0082, #9400d3) }
+  100% { border-image-source: linear-gradient(90deg, 
+    #9400d3, #ff0000, #ff7f00, #ffff00, 
+    #00ff00, #0000ff, #4b0082) }
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease;
+}
+
+
+
+
+
+
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  color: black;
+}
+
+
+
+
+
+
+
+
+"use client"
+import React, { useState } from 'react'
+
+const Page = () => {
+  const [Title, setTitle] = useState("")
+  const [Disc, setDisc] = useState("")
+  const [mainTask, setmainTask] = useState([])
+
+  const submitHandler = (e) => {
+    e.preventDefault()
+    if (Title.trim() && Disc.trim()) {
+      setmainTask([...mainTask, { Title, Disc }])
+      setTitle("")
+      setDisc("")
+    }
+  }
+
+  const deleteHandler = (i) => {
+    let copytask = [...mainTask]
+    copytask.splice(i, 1)
+    setmainTask(copytask)
+  }
+
+  let renderTask = <h2 className="rainbow-text text-xl font-semibold">No tasks yet! Add some!</h2>
+  
+  if (mainTask.length > 0) {
+    renderTask = mainTask.map((t, i) => {
+      return (
+        <li key={i} className="flex items-center justify-between mb-5 p-4 rainbow-border rounded-lg bg-white bg-opacity-80 backdrop-blur-sm">
+          <div className="flex justify-between w-2/3">
+            <h5 className="text-xl font-semibold rainbow-text">{t.Title}</h5>
+            <h6 className="text-lg rainbow-text-subtle">{t.Disc}</h6>
+          </div>
+          <button 
+            onClick={() => deleteHandler(i)} 
+            className="bg-gradient-to-r from-red-400 to-pink-500 text-white px-4 py-2 rounded-lg font-bold hover:scale-105 transition-transform"
+          >
+            Delete
+          </button>
+        </li>
+      )
+    })
+  }
+
+  return (
+    <div className="min-h-screen  bg-gradient-to-br from-gray-100 to-gray-300">
+      <header className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 p-5 shadow-lg">
+        <h1 className="text-5xl font-bold text-center text-white rainbow-text-shadow">
+          My Todo List
+        </h1>
+      </header>
+
+      <form onSubmit={submitHandler} className="flex flex-col md:flex-row items-center justify-center p-5 gap-4">
+        <input 
+          type="text" 
+          className="text-xl rounded-xl px-4 py-3 rainbow-border focus:outline-none focus:ring-2 focus:ring-purple-300 w-full max-w-md bg-white bg-opacity-80"
+          placeholder="Enter Task here" 
+          value={Title} 
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <input 
+          type="text" 
+          className="text-xl rounded-xl px-4 py-3 rainbow-border focus:outline-none focus:ring-2 focus:ring-purple-300 w-full max-w-md bg-white bg-opacity-80"
+          placeholder="Enter Description here" 
+          value={Disc} 
+          onChange={(e) => setDisc(e.target.value)}
+        />
+        <button 
+          type="submit"
+          className="px-6 py-3 rounded-xl text-xl font-bold rainbow-bg hover:scale-105 transition-transform text-white shadow-lg"
+        >
+          Add Task
+        </button>
+      </form>
+
+      <div className="p-8 max-w-4xl mx-auto">
+        <ul className="space-y-4">
+          {renderTask}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+export default Page
